@@ -1,0 +1,35 @@
+name: Build DawnLike
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Extract project
+        run: |
+          unzip -o DawnLike-1.21.11-Fabric.zip
+          cd DawnLike-1.21.11-Fabric
+          echo "PROJECT_DIR=$PWD" >> $GITHUB_ENV
+
+      - name: Build
+        run: |
+          cd "$PROJECT_DIR"
+          gradle build --no-daemon
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: DawnLike-JAR
+          path: ${{ env.PROJECT_DIR }}/build/libs/*.jar
